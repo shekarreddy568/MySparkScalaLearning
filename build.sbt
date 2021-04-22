@@ -1,42 +1,41 @@
-name := "MySparkScalaLearning"
+val sparkVersion = "3.0.0"
 
-version := "0.1"
+lazy val root = (project in file(".")).settings(
+  inThisBuild(
+    List(
+      organization := "com.test.learning",
+      scalaVersion := "2.12.12",
+      version := "0.1",
+      assemblyJarName in assembly := "learning_spark.jar"
+    )
+  ),
+  name := "learning_spark",
+  libraryDependencies ++= List(
+    //Spark
+    "org.apache.spark" %% "spark-core" % sparkVersion,
+    "org.apache.spark" %% "spark-sql"  % sparkVersion,
+    "org.apache.spark" %% "spark-hive" % sparkVersion,
+    "org.apache.spark" %% "spark-avro" % sparkVersion,
+    "io.delta"         %% "delta-core" % "0.8.0",
+    //Aws
+    "org.apache.hadoop" % "hadoop-aws"          % "3.2.0",
+    "org.apache.hadoop" % "hadoop-common"       % "3.2.0",
+    "com.amazonaws"     % "aws-java-sdk-bundle" % "1.11.874",
+    "org.endpoints4s"  %% "akka-http-client"    % "2.0.0",
+    // Config and logging
+    "com.lambdista" %% "config" % "0.7.1",
+    "com.typesafe"   % "config" % "1.2.0",
+    // Testing
+    "org.scalatest" %% "scalatest"    % "3.2.7" % Test,
+    "org.mockito"    % "mockito-core" % "2.7.22",
+    "org.specs2"    %% "specs2-core"  % "4.9.3" % Test
+  )
+)
 
-scalaVersion := "2.12.8"
+parallelExecution in ThisBuild := false
 
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-core
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-kafka-0-10
-libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10
-libraryDependencies += "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-hive
-libraryDependencies += "org.apache.spark" %% "spark-hive" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-yarn
-libraryDependencies += "org.apache.spark" %% "spark-yarn" % "2.4.5"
-
-// https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs
-libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "3.1.1"
-
-// https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client
-libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "3.1.1"
-
-
-////// Jackson Dependencies //////////
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.8"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.8"
-dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.8"
-
-// https://mvnrepository.com/artifact/net.jpountz.lz4/lz4
-libraryDependencies += "net.jpountz.lz4" % "lz4" % "1.3.0"
-
-lazy val excludeJars = ExclusionRule(organization = "net.jpountz.lz4", name = "lz4")
-
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case "reference.conf"              => MergeStrategy.concat
+  case x                             => MergeStrategy.first
+}
